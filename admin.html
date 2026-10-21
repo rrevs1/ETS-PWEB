@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Petugas | LibraryReg</title>
+    <meta name="description" content="Dashboard petugas untuk mengelola data anggota LibraryReg.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="admin">
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container nav-container">
+        <a class="navbar-brand brand" href="index.html">
+            <span class="brand-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 7v14"/>
+                <path d="M3 18V5a1 1 0 0 1 1-1h4a4 4 0 0 1 4 4 4 4 0 0 1 4-4h4a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-5a3 3 0 0 0-3 2 3 3 0 0 0-3-2H4a1 1 0 0 1-1-1z"/>
+            </svg>
+            </span>
+            <span>LibraryReg</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLibrary" aria-controls="navbarLibrary" aria-expanded="false" aria-label="Buka navigasi">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarLibrary">
+            <ul class="navbar-nav mx-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+            <li class="nav-item"><a class="nav-link" href="tentang.html">Tentang</a></li>
+            <li class="nav-item"><a class="nav-link" href="layanan.html">Layanan</a></li>
+            <li class="nav-item"><a class="nav-link" href="anggota.html">Anggota</a></li>
+            <li class="nav-item"><a class="nav-link" href="pendaftaran.html">Pendaftaran</a></li>
+            </ul>
+            <div class="nav-buttons">
+            <button id="logoutButton" class="admin-logout" type="button">Keluar</button>
+            </div>
+        </div>
+        </div>
+    </nav>
+
+    <main class="admin-page">
+        <div class="section-container">
+
+        <section class="admin-heading">
+            <div>
+            <span class="eyebrow">AREA PETUGAS</span>
+            <h1>Dashboard Pengelolaan Anggota</h1>
+            <p>Kelola data anggota yang telah mendaftar melalui LibraryReg. Kamu dapat melihat detail, mengubah informasi, dan menghapus data anggota.</p>
+            </div>
+        </section>
+
+        <section class="admin-summary">
+            <div>
+            <span>Total Anggota</span>
+            <strong id="memberCount">0 anggota</strong>
+            </div>
+            <p>Data tersimpan di localStorage browser ini.</p>
+        </section>
+
+        <section class="admin-directory">
+            <div class="admin-directory-heading">
+            <div>
+                <span class="eyebrow">DATA ANGGOTA</span>
+                <h2>Daftar Anggota</h2>
+                <p>Gunakan pencarian atau filter untuk menemukan data yang dibutuhkan.</p>
+            </div>
+            </div>
+
+            <div class="admin-toolbar">
+            <input type="search" id="searchMember" class="form-control" placeholder="Cari nama atau NIM/NRP..." aria-label="Cari anggota berdasarkan nama atau nomor identitas">
+            <select id="filterType" class="form-select" aria-label="Filter jenis anggota">
+                <option value="">Semua Jenis Anggota</option>
+                <option value="Mahasiswa">Mahasiswa</option>
+                <option value="Dosen">Dosen</option>
+                <option value="Tenaga Kependidikan">Tenaga Kependidikan</option>
+            </select>
+            </div>
+
+            <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Nama Lengkap</th>
+                    <th scope="col">NIM / NRP / NIP</th>
+                    <th scope="col">Program Studi / Unit</th>
+                    <th scope="col">Jenis Keanggotaan</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+                </thead>
+                <tbody id="membersTableBody"></tbody>
+            </table>
+            <p id="emptyMembers" class="admin-hint" hidden>Data anggota tidak ditemukan.</p>
+            </div>
+
+            <div class="directory-bottom">
+            <p>Data anggota dapat dikelola melalui tombol aksi pada tabel.</p>
+            <span>Dashboard LibraryReg</span>
+            </div>
+        </section>
+
+        <p class="admin-hint">Catatan: data disimpan secara lokal pada browser ini, bukan di server atau database pusat.</p>
+        </div>
+    </main>
+
+    <div id="viewModal" class="admin-modal" hidden>
+        <section class="admin-modal-card" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
+        <div class="admin-modal-header">
+            <h2 id="viewModalTitle">Detail Anggota</h2>
+            <button class="modal-close" type="button" data-close-modal="viewModal" aria-label="Tutup">×</button>
+        </div>
+        <div id="memberDetails" class="detail-grid"></div>
+        </section>
+    </div>
+
+    <div id="editModal" class="admin-modal" hidden>
+        <section class="admin-modal-card" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+        <div class="admin-modal-header">
+            <h2 id="editModalTitle">Edit Data Anggota</h2>
+            <button class="modal-close" type="button" data-close-modal="editModal" aria-label="Tutup">×</button>
+        </div>
+        <form id="editMemberForm">
+            <input type="hidden" id="editMemberKey">
+            <div class="row g-3">
+            <div class="col-12">
+                <label for="editNama">Nama Lengkap</label>
+                <input class="form-control" id="editNama" required>
+            </div>
+            <div class="col-md-6">
+                <label for="editNim">NIM / NRP / NIP</label>
+                <input class="form-control" id="editNim" required>
+            </div>
+            <div class="col-md-6">
+                <label for="editProdi">Program Studi / Unit</label>
+                <input class="form-control" id="editProdi" required>
+            </div>
+            <div class="col-12">
+                <label for="editAlamat">Alamat</label>
+                <textarea class="form-control" id="editAlamat" rows="2"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label for="editTelepon">Nomor Telepon</label>
+                <input class="form-control" id="editTelepon" type="tel">
+            </div>
+            <div class="col-md-6">
+                <label for="editEmail">Email</label>
+                <input class="form-control" id="editEmail" type="email">
+            </div>
+            <div class="col-12">
+                <label for="editJenis">Jenis Keanggotaan</label>
+                <select class="form-select" id="editJenis" required>
+                <option value="Mahasiswa">Mahasiswa</option>
+                <option value="Dosen">Dosen</option>
+                <option value="Tenaga Kependidikan">Tenaga Kependidikan</option>
+                </select>
+            </div>
+            <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                <button class="admin-logout" type="button" data-close-modal="editModal">Batal</button>
+                <button class="edit-submit" type="submit">Simpan Perubahan</button>
+            </div>
+            </div>
+        </form>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="section-container">
+        <div class="footer-grid">
+            <div class="footer-about">
+            <a href="index.html" class="brand footer-brand">
+                <span class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 7v14"/>
+                    <path d="M3 18V5a1 1 0 0 1 1-1h4a4 4 0 0 1 4 4 4 4 0 0 1 4-4h4a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-5a3 3 0 0 0-3 2 3 3 0 0 0-3-2H4a1 1 0 0 1-1-1z"/>
+                </svg>
+                </span>
+                LibraryReg
+            </a>
+            <p>Website informasi dan pendaftaran anggota perpustakaan.</p>
+            <div class="social-links">
+                <a href="https://instagram.com/" aria-label="Instagram">ig</a>
+                <a href="https://facebook.com/" aria-label="Facebook">f</a>
+                <a href="https://youtube.com/" aria-label="YouTube">▶</a>
+            </div>
+            </div>
+
+            <div class="footer-column">
+            <h3>Menu</h3>
+            <a href="index.html">Beranda</a>
+            <a href="tentang.html">Tentang Perpustakaan</a>
+            <a href="layanan.html">Layanan</a>
+            <a href="anggota.html">Daftar Anggota</a>
+            </div>
+
+            <div class="footer-column">
+            <h3>Kontak</h3>
+            <a href="pendaftaran.html">Pendaftaran Anggota</a>
+            <a href="login.html">Login Petugas</a>
+            <a href="mailto:perpustakaan@example.com">Email Perpustakaan</a>
+            <span>Surabaya, Indonesia</span>
+            </div>
+
+            <div class="footer-column">
+            <h3>Jam Layanan</h3>
+            <p><span>Senin–Jumat</span><span>08.00–16.00</span></p>
+            <p><span>Sabtu</span><span>08.00–13.00</span></p>
+            <small>Minggu dan hari libur tutup</small>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>Panel pengelolaan anggota.</p>
+            <p>© <span id="year"></span> LibraryReg</p>
+        </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
